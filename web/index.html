@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kchat</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="/js/always.js" type="module"></script>
+    <script src="/js/index.js" type="module"></script>
+</head>
+
+</html>
+
+<body class="body">
+    <main class="page">
+        <div style="display: flex; flex-direction: column; width: 100%">
+            <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
+                <div>
+                    <span id="models-loading">
+                        Loading<span class="loading-dots"></span>
+                    </span>
+                    <span id="models" style="display: none"></span>
+                </div>
+                <div style="width: 100px;">
+                    <span id="user-loading">
+                        Loading<span class="loading-dots"></span>
+                    </span>
+                    <span id="user" style="display: none; cursor: pointer;" class="index-user"></span>
+                    <div id="user-menu" class="index-user-menu">
+                        <a href="/settings" class="index-user-menu-item">Settings</a>
+                        <a href="/logout" class="index-user-menu-item">Logout</a>
+                    </div>
+                </div>
+            </div>
+            <div></div>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kchat</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="/js/always.js" type="module"></script>
+  <script src="/js/login.js" type="module"></script>
+  <style>
+
+  </style>
+</head>
+
+<body class="body">
+  <main class="page login-main">
+    <form class="login-container" id="login-form">
+      <h2>Login to kchat</h2>
+      <input type="text" placeholder="Username" required autocomplete="username" id="login-username">
+      <input type="password" placeholder="Password" required autocomplete="current-password" id="login-password">
+      <button type="submit">
+        <span id="login-button-text">Login</span>
+        <span class="loading-dots" id="login-button-loading" style="display: none;"></span>
+      </button>
+      <span class="error-message" id="login-error-message" style="display: none;"></span>
+    </form>
+  </main>
+</body>
+
+</html>

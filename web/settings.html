@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kchat</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/settings.css">
+  <script src="/js/always.js" type="module"></script>
+  <script src="/js/settings.js" type="module"></script>
+</head>
+
+<body class="body">
+  <div class="modal" id="settings-add-user-modal">
+    <div class="modal-content" style="width:300px;">
+      <form class="vertical" id="settings-add-user-form">
+        <input type="text" class="basic-input" id="settings-add-user-username" placeholder="Username" required>
+        <input type="password" class="basic-input" id="settings-add-user-password" placeholder="Password" required>
+        <input type="password" class="basic-input" id="settings-add-user-password-confirm"
+          placeholder="Confirm Password" required>
+        <span class="error-message" id="settings-add-user-error-message" style="display: none;"></span>
+        <div style="display: flex; flex-direction: row; justify-content: end; align-items: center; gap: 1rem;">
+          <span class="clickable-span" id="settings-add-user-cancel-button">
+            Cancel
+          </span>
+          <button class="button" type="submit" id="settings-add-user-submit-button">
+            <span id="settings-add-user-submit-button-text">Add User</span>
+            <span class="loading-dots" id="settings-add-user-submit-button-loading" style="display: none;"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <main class="page">
+    <div class="nested">
+      <span class="nested-back">&lt;-</span>
+      <span class="nested-title">Settings</span>
+    </div>
+    <div class="settings-container">
+      <nav class="settings-nav">
+        <span class="settings-nav-item" data-qstring="connections">
+          Connections
+        </span>
+        <span class="settings-nav-item" data-qstring="users">
+          Users
+        </span>
+      </nav>
+      <div class="card" id="settings-mcontent-connections" style="display: none;">
+        <script type="module" src="/js/settings/connections.js"></script>
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+          <span style="font-weight: bold; margin-top: 4px;">
+            Settings / Connections
+          </span>
+          <span style="display: flex; flex-direction: row; gap: 0.5rem; font-size: 1.5rem; align-items: center;">
+            <span class="clickable-span" style="margin-top: 4px;" id="settings-add-connection-button">+</span>
+            <span class="clickable-span">⟳</span>
+          </span>
+        </div>
+        <div>
+          <span class="loading-dots" id="connection-list-loading"></span>
+          <div id="connection-list-content"></div>
+        </div>
+      </div>
+      <div class="card" id="settings-mcontent-users" style="display: none;">
+        <script type="module" src="/js/settings/users.js"></script>
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+          <span style="font-weight: bold; margin-top: 4px;">
+            Settings / Users
+          </span>
+          <span style="display: flex; flex-direction: row; gap: 0.5rem; font-size: 1.5rem; align-items: center;">
+            <span class="clickable-span" style="margin-top: 4px;" id="settings-add-user-button">+</span>
+            <span class="clickable-span">⟳</span>
+          </span>
+        </div>
+        <div>
+          <span class="loading-dots" id="user-list-loading"></span>
+          <div id="user-list-content"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+.settings-nav-item {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.settings-nav-item:hover {
+  background-color: var(--accent-color);
+}
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.settings-nav {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .settings-container {
+    flex-direction: row;
+  }
+
+  .settings-nav {
+    flex-direction: column;
+    width: 200px;
+  }
+}
