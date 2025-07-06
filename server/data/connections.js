@@ -1,6 +1,5 @@
-const persistedJson = require("../helpers/persisted-json");
-const uuid = require("../helpers/uuid");
-const connectionsJson = persistedJson("data/connections.json");
+const DB = require("../db");
+const connectionsDb = new DB("data/connections.db");
 
 module.exports = function connections() {
   function addConnection({
@@ -8,23 +7,59 @@ module.exports = function connections() {
     key,
     name,
   }) {
-    const connection = {
-      id: uuid(),
+    const id = connectionsDb.insert({
       host,
       key,
       name,
       createdAt: new Date().toISOString(),
-    };
-    connectionsJson[connection.id] = connection;
-    return connection;
+    });
+    return connectionsDb.select(id);
   }
 
   function findConnections() {
-    return Object.values(connectionsJson).filter(conn => conn.id);
+    return connectionsDb.selectAll();
   }
+
+  async function fetchConnectionModels(connectionId) {
+    const connection = connectionsDb.select(connectionId);
+    try {
+      const response = await fetch(`${connection.host}/models`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...connection.key ? { Authorization: `Bearer ${connection.key}` } : {},
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch models: ${response.statusText}`);
+      }
+      const result = {
+        connection,
+        models: (await response.json()).data,
+      };
+      return result;
+    } catch {
+      return {
+        connection,
+        models: null,
+      };
+    }
+  }
+
+  async function findAllConnectionsModels() {
+    const connections = findConnections();
+    const connectionsModels = await Promise.all(
+      connections.map(c => fetchConnectionModels(c.id))
+    );
+    return connectionsModels;
+  }
+
 
   return {
     addConnection,
     findConnections,
+    fetchConnectionModels,
+    findAllConnectionsModels,
   };
 }

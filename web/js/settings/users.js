@@ -1,4 +1,4 @@
-import { addUser, findUsers, removeUser } from "../api.js";
+import { addUser, findUsers } from "../api.js";
 import { onVisible, createdAtToDate, openModal, closeModal } from "../lib.js";
 
 const listItem = `

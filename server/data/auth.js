@@ -1,66 +1,67 @@
-const persistedJson = require("../helpers/persisted-json");
 const sha256 = require("../helpers/sha256");
 const uuid = require("../helpers/uuid");
-const authJson = persistedJson("data/auth.json");
+const DB = require("../db");
+const serverKeyDb = new DB("data/auth-serverKey.db");
+const usersDb = new DB("data/auth-users.db");
+
+function serializeUser(user) {
+  const clone = { ...user };
+  delete clone.password;
+  return clone;
+}
+
+if (!serverKeyDb.selectWhereOne(() => true)) {
+  const newKey = uuid();
+  serverKeyDb.insert({ key: newKey });
+}
+if (!usersDb.selectWhereOne(user => user.username === "admin")) {
+  usersDb.insert({
+    username: "admin",
+    password: sha256("admin"),
+    createdAt: new Date().toISOString(),
+  });
+}
 
 module.exports = function auth() {
-  if (!authJson.initialized) {
-    authJson.users = {
-      admin: {
-        password: sha256("admin"),
-        createdAt: new Date().toISOString(),
-      },
-    }
-    authJson.serverKey = uuid();
-    authJson.initialized = true;
-  }
+  const serverKey = serverKeyDb.selectWhereOne(() => true).key;
 
   function login(username, password) {
-    if (authJson.users[username]?.password !== sha256(password)) {
+    const user = usersDb.selectWhereOne(u => u.username === username);
+    if (!user || user.password !== sha256(password)) {
       return false;
     }
-    return `${sha256(authJson.serverKey)}.${username}`
+    return `${sha256(serverKey)}.${user.id}`;
   }
 
   function checkSession(sessionId) {
-    const [signature, username] = sessionId.split(".");
-    if (!sha256(authJson.serverKey) === signature) {
+    const [signature, id] = sessionId.split(".");
+    if (sha256(serverKey) !== signature) {
       return false;
     }
-    return username;
+    return usersDb.select(id);
   }
 
   function findUsers() {
-    return Object.keys(authJson.users).map(username => ({
-      username,
-      createdAt: authJson.users[username].createdAt,
-    }));
+    return usersDb.selectAll().map(serializeUser);
   }
 
-  function addUser(username, password) {
-    if (authJson.users[username]) {
+  function addUser({
+    username,
+    password,
+  }) {
+    if (usersDb.selectWhereOne(user => user.username === username)) {
       throw new Error("User already exists");
     }
-    authJson.users = {
-      ...authJson.users,
-      [username]: {
-        password: sha256(password),
-        createdAt: new Date().toISOString(),
-      },
-    };
-    return authJson.users[username];
+    const id = usersDb.insert({
+      username,
+      password: sha256(password),
+      createdAt: new Date().toISOString(),
+    });
+    return usersDb.select(id);
   }
 
-  function removeUser(username) {
-    if (!authJson.users[username]) {
-      throw new Error("User does not exist");
-    }
-    if (Object.keys(authJson.users).length <= 1) {
-      throw new Error("Cannot remove the last user");
-    }
-    const users = authJson.users;
-    delete users[username];
-    authJson.users = users;
+  function removeUser(id) {
+    usersDb.delete(id);
   }
 
   return {

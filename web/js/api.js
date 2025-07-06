@@ -14,6 +14,62 @@ export function findUsers() {
   })
 }
 
+export function findConnections() {
+  return fetch(apiServer, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-kchat-token": localStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      topic: "findConnections",
+      data: {},
+    }),
+  })
+}
+
+export function findModels() {
+  return fetch(apiServer, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-kchat-token": localStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      topic: "findModels",
+      data: {},
+    }),
+  })
+}
+
+export function findFavouriteModel() {
+  return fetch(apiServer, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-kchat-token": localStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      topic: "findFavouriteModel",
+      data: {},
+    }),
+  })
+}
+
+export function addConnection(name, host, key) {
+  return fetch(apiServer, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-kchat-token": localStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      topic: "addConnection",
+      data: { name, host, key },
+    }),
+  })
+}
+
 export function addUser(username, password) {
   return fetch(apiServer, {
     method: "POST",

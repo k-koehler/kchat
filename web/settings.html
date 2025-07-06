@@ -32,6 +32,28 @@
       </form>
     </div>
   </div>
+  <div class="modal" id="settings-add-connection-modal">
+    <div class="modal-content" style="width:350px;">
+      <form class="vertical" id="settings-add-connection-form">
+        <span>
+          Please enter an OpenAI compatible connection URL
+        </span>
+        <input type="text" class="basic-input" id="settings-add-connection-name" placeholder="Name" required>
+        <input type="text" class="basic-input" id="settings-add-connection-url" placeholder="URL" required>
+        <input type="text" class="basic-input" id="settings-add-connection-key" placeholder="API Key (optional)">
+        <span class="error-message" id="settings-add-connection-error-message" style="display: none;"></span>
+        <div style="display: flex; flex-direction: row; justify-content: end; align-items: center; gap: 1rem;">
+          <span class="clickable-span" id="settings-add-connection-cancel-button">
+            Cancel
+          </span>
+          <button class="button" type="submit" id="settings-add-connection-submit-button">
+            <span id="settings-add-connection-submit-button-text">Add Connection</span>
+            <span class="loading-dots" id="settings-add-connection-submit-button-loading" style="display: none;"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
   <main class="page">
     <div class="nested">
       <span class="nested-back">&lt;-</span>
@@ -46,7 +68,7 @@
           Users
         </span>
       </nav>
-      <div class="card" id="settings-mcontent-connections" style="display: none;">
+      <div class="card" id="settings-mcontent-connections" style="display: none; height: fit-content;">
         <script type="module" src="/js/settings/connections.js"></script>
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
           <span style="font-weight: bold; margin-top: 4px;">
@@ -57,12 +79,12 @@
             <span class="clickable-span">⟳</span>
           </span>
         </div>
-        <div>
+        <div class="vertical">
           <span class="loading-dots" id="connection-list-loading"></span>
-          <div id="connection-list-content"></div>
+          <div class="vertical" id="connection-list-content" style="gap: 0;"></div>
         </div>
       </div>
-      <div class="card" id="settings-mcontent-users" style="display: none;">
+      <div class="card" id="settings-mcontent-users" style="display: none; height: fit-content;">
         <script type="module" src="/js/settings/users.js"></script>
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
           <span style="font-weight: bold; margin-top: 4px;">
@@ -73,9 +95,9 @@
             <span class="clickable-span">⟳</span>
           </span>
         </div>
-        <div>
+        <div class="vertical">
           <span class="loading-dots" id="user-list-loading"></span>
-          <div id="user-list-content"></div>
+          <div class="vertical" style="gap:0;" id="user-list-content"></div>
         </div>
       </div>
     </div>

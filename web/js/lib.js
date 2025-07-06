@@ -49,13 +49,21 @@ function onHidden(id, cb) {
   }
 }
 
-export function getMe() {
+export function getMeId() {
   const token = localStorage.getItem("token")
   if (!token) {
     return null
   }
-  const [, username] = token.split(".")
-  return username
+  const [, id] = token.split(".");
+  return id;
+}
+
+export function getMeUsername() {
+  const username = localStorage.getItem("username");
+  if (!username) {
+    return null;
+  }
+  return username;
 }
 
 export function openModal(id) {
@@ -87,3 +95,11 @@ export function closeModal(id) {
   }
 }
 
+export function isValidUrl(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}

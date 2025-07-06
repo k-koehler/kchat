@@ -1,8 +1,5 @@
 const http = require("http");
-const login = require("./controllers/login");
-const findUsers = require("./controllers/find-users");
-const addUser = require("./controllers/add-user");
-const removeUser = require("./controllers/remove-user");
+const fs = require("fs");
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,7 +29,7 @@ const server = http.createServer(async (req, res) => {
     req.on("data", chunk => {
       body += chunk.toString();
     });
-    req.on("end", () => {
+    req.on("end", async () => {
       try {
         let json;
         try {
@@ -53,32 +50,21 @@ const server = http.createServer(async (req, res) => {
           res.end(JSON.stringify({ error: "Data is required" }));
           return;
         }
-        switch (topic) {
-          case "login":
-            return login({
-              req,
-              res,
-            }, data);
-          case "findUsers":
-            return findUsers({
-              req,
-              res,
-            });
-          case "addUser":
-            return addUser({
-              req,
-              res,
-            }, data);
-          case "removeUser":
-            return removeUser({
-              req,
-              res,
-            }, data);
-          default:
-            res.writeHead(400, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: `Unknown topic: ${topic}` }));
-            return;
+        const controllerPayload = [{
+          req,
+          res,
+        }, data];
+        const controllerFiles = fs.readdirSync("./server/controllers");
+        const controllers = controllerFiles
+          .filter(file => file.endsWith(".js"))
+          .map(file => require(`./controllers/${file}`));
+        const controller = controllers.find(c => c.controllerName === topic || c.name === topic);
+        if (!controller) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: `Unknown topic: ${topic}` }));
+          return;
         }
+        return await controller(...controllerPayload);
       } catch (error) {
         console.error("Error processing request:", error);
         res.writeHead(500, { "Content-Type": "text/plain" });

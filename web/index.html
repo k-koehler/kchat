@@ -14,27 +14,55 @@
 </html>
 
 <body class="body">
-    <main class="page">
-        <div style="display: flex; flex-direction: column; width: 100%">
-            <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
-                <div>
-                    <span id="models-loading">
-                        Loading<span class="loading-dots"></span>
-                    </span>
-                    <span id="models" style="display: none"></span>
-                </div>
-                <div style="width: 100px;">
-                    <span id="user-loading">
-                        Loading<span class="loading-dots"></span>
-                    </span>
-                    <span id="user" style="display: none; cursor: pointer;" class="index-user"></span>
-                    <div id="user-menu" class="index-user-menu">
-                        <a href="/settings" class="index-user-menu-item">Settings</a>
-                        <a href="/logout" class="index-user-menu-item">Logout</a>
-                    </div>
+    <main class="page vertical">
+        <div class="modal" id="index-connections-modal">
+            <div class="modal-content vertical" style="width: 400px;">
+                <span>
+                    Available connections and models
+                </span>
+                <div id="index-connections-list" class="card vertical" style="max-height: 600px; overflow-y: scroll;">
                 </div>
             </div>
-            <div></div>
+        </div>
+        <div class="modal" id="index-models-modal">
+            <div class="modal-content vertical" style="width: 400px;">
+                <span>
+                    Select a model
+                </span>
+                <div id="index-models-list" class="vertical" style="max-height: 600px; overflow-y: scroll;">
+                </div>
+            </div>
+        </div>
+        <div
+            style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; align-items: center;">
+            <div>
+                <span id="index-models-loading">
+                    Loading<span class="loading-dots"></span>
+                </span>
+                <span id="index-models" style="display: none"></span>
+            </div>
+            <div style="width: 100px;">
+                <span id="index-user-loading">
+                    Loading<span class="loading-dots"></span>
+                </span>
+                <span id="index-user" style="display: none;" class="horizontal">
+                    <span id="index-user-name"></span>
+                    <a href="/settings" style="font-size: 1.5rem; color: var(--text-color);">
+                        ⚙
+                    </a>
+                </span>
+            </div>
+        </div>
+        <div class="vertical" style="margin-top: 4rem">
+            <span style="font-size: 2rem; text-align: center;">
+                <span class="loading-dots" style="width: 60px;" id="index-model-loading"></span>
+                <span id="index-model" style="display: none;" class="clickable-span" data-connectionId=""
+                    data-modelId=""></span>
+            </span>
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <textarea id="index-input" placeholder="Type your message here..." rows="3" class="basic-textarea"
+                    style="border-width: 0;"></textarea>
+            </div>
         </div>
     </main>
 </body>

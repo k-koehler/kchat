@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const data = await reponse.json();
       window.localStorage.setItem("token", data.token);
+      window.localStorage.setItem("username", username);
       window.location.href = "/"
     } catch (e) {
       console.error("Login failed:", e);
