@@ -1,3 +1,33 @@
+export class Observable {
+  #value;
+  #subscribers;
+
+  constructor(value) {
+    this.#value = value;
+    this.#subscribers = [];
+    this.#subscribers.forEach(callback => callback(value));
+  }
+
+  get value() {
+    return this.#value;
+  }
+
+  set(newValue) {
+    this.#value = newValue;
+    this.#subscribers.forEach(callback => callback(newValue));
+  }
+
+  subscribe(callback) {
+    this.#subscribers.push(callback);
+    return () => {
+      const index = this.#subscribers.indexOf(callback);
+      if (index > -1) {
+        this.#subscribers.splice(index, 1);
+      }
+    };
+  }
+}
+
 
 export function createdAtToDate(createdAt) {
   const date = new Date(createdAt);

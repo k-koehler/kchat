@@ -36,7 +36,7 @@ module.exports = function connections() {
       }
       const result = {
         connection,
-        models: (await response.json()).data,
+        models: (await response.json()).data.sort((a, b) => a.id.localeCompare(b.id)),
       };
       return result;
     } catch {
@@ -52,7 +52,7 @@ module.exports = function connections() {
     const connectionsModels = await Promise.all(
       connections.map(c => fetchConnectionModels(c.id))
     );
-    return connectionsModels;
+    return connectionsModels.sort((a, b) => a.connection.id.localeCompare(b.connection.id))
   }
 
 

@@ -56,6 +56,20 @@ export function findFavouriteModel() {
   })
 }
 
+export function setFavouriteModel(connectionId, modelId) {
+  return fetch(apiServer, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-kchat-token": localStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      topic: "setFavouriteModel",
+      data: { connectionId, modelId },
+    }),
+  })
+}
+
 export function addConnection(name, host, key) {
   return fetch(apiServer, {
     method: "POST",

@@ -1,5 +1,9 @@
-import { findFavouriteModel, findModels } from "./api.js";
-import { getMeUsername, openModal } from "./lib.js";
+import { findFavouriteModel, findModels, setFavouriteModel } from "./api.js";
+import { getMeUsername, openModal, Observable, closeModal } from "./lib.js";
+
+const selectedConnectionModel = new Observable(null);
+const favouriteConnectionModel = new Observable(null);
+
 
 document.addEventListener('DOMContentLoaded', async () => {
   const userLoading = document.getElementById("index-user-loading");
@@ -34,6 +38,15 @@ const connectionsListConnectionHtml = `
 </div>
 `
 
+const modelModalListItemHtml = `
+<span class="clickable-span" data-connectionId="{{connectionId}}" data-modelId="{{modelId}}">
+  <span class="horizontal" style="align-items: center; gap: 0.5rem;">
+        <span id="index-favourite-model-{{connectionId}}-{{modelId}}" data-connectionId="{{connectionId}}" data-modelId="{{modelId}}">★</span>
+    <span id="index-select-model-{{connectionId}}-{{modelId}}" class="index-hoverable">{{modelId}}</span>  
+  </span>
+</span>
+`;
+
 document.addEventListener('DOMContentLoaded', async () => {
   const modelsLoading = document.getElementById("index-models-loading");
   const modelsElement = document.getElementById("index-models");
@@ -57,25 +70,114 @@ document.addEventListener('DOMContentLoaded', async () => {
     connectionElement.innerHTML = connectionHtmlFilled;
     connectionsList.appendChild(connectionElement);
     const modelsList = connectionElement.querySelector(`#index-connection-list-${connection.id}-models`);
-    for (const model of connectionModels) {
-      const modelElement = document.createElement("span");
-      modelElement.textContent = model.id;
-      modelsList.appendChild(modelElement);
+    const modelModalList = document.getElementById("index-models-modal-list");
+    const modelModalListLoading = document.getElementById("index-models-modal-loading");
+    if (connectionModels) {
+      for (const model of connectionModels) {
+        // main model span
+        const modelElement = document.createElement("span");
+        modelElement.textContent = model.id;
+        modelsList.appendChild(modelElement);
+
+        // model modal list items
+        const modelModalListItem = modelModalListItemHtml
+          .replaceAll("{{connectionId}}", connection.id)
+          .replaceAll("{{modelId}}", model.id);
+        const modelModalListItemElement = document.createElement("span");
+        modelModalListItemElement.innerHTML = modelModalListItem;
+        modelModalList.appendChild(modelModalListItemElement);
+        modelModalListLoading.style.display = "none";
+        modelModalList.style.display = "flex";
+        const starSpan = modelModalListItemElement.querySelector(`#index-favourite-model-${connection.id}-${model.id}`);
+        starSpan.addEventListener("click", async (event) => {
+          favouriteConnectionModel.set({
+            connectionId: connection.id,
+            modelId: model.id,
+          });
+        });
+        const selectSpan = modelModalListItemElement.querySelector(`#index-select-model-${connection.id}-${model.id}`);
+        selectSpan.addEventListener("click", async (event) => {
+          selectedConnectionModel.set({
+            connectionId: connection.id,
+            modelId: model.id,
+          });
+          closeModal("index-models-modal");
+        });
+        if (favouriteConnectionModel.value &&
+          favouriteConnectionModel.value.connectionId === connection.id &&
+          favouriteConnectionModel.value.modelId === model.id) {
+          starSpan.textContent = "★";
+          starSpan.style.color = "gold";
+        }
+        if (selectedConnectionModel.value &&
+          selectedConnectionModel.value.connectionId === connection.id &&
+          selectedConnectionModel.value.modelId === model.id) {
+          selectSpan.style.fontWeight = "bold";
+        }
+      }
     }
   }
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const modelLoading = document.getElementById("index-model-loading");
-  const modelElement = document.getElementById("index-model");
   const favouriteModel = await (await findFavouriteModel()).json();
-  modelLoading.style.display = "none";
   if (favouriteModel) {
-    modelElement.textContent = favouriteModel.modelId;
-    modelElement.setAttribute("data-connectionId", favouriteModel.connectionId);
-    modelElement.setAttribute("data-modelId", favouriteModel.modelId);
-    modelElement.style.display = "inline-block";
-  } else {
-    modelElement.style.display = "none";
+    favouriteConnectionModel.set({
+      connectionId: favouriteModel.connectionId,
+      modelId: favouriteModel.modelId,
+    });
+    selectedConnectionModel.set({
+      connectionId: favouriteModel.connectionId,
+      modelId: favouriteModel.modelId,
+    });
   }
+});
+
+selectedConnectionModel.subscribe((data) => {
+  if (!data) {
+    return;
+  }
+  const modelElement = document.getElementById("index-model");
+  const modelLoading = document.getElementById("index-model-loading");
+  modelLoading.style.display = "none";
+  modelElement.textContent = data.modelId;
+  modelElement.setAttribute("data-connectionId", data.connectionId);
+  modelElement.setAttribute("data-modelId", data.modelId);
+  modelElement.style.display = "inline-block";
+  const selectSpan = document.getElementById(`index-select-model-${data.connectionId}-${data.modelId}`);
+  if (selectSpan) {
+    selectSpan.style.fontWeight = "bold";
+    const otherSelectSpans = document.querySelectorAll(`#index-models-modal-list span[id^="index-select-model-"]`);
+    otherSelectSpans.forEach(span => {
+      if (span.id !== `index-select-model-${data.connectionId}-${data.modelId}`) {
+        span.style.fontWeight = "normal";
+      }
+    });
+  }
+});
+
+favouriteConnectionModel.subscribe((data) => {
+  if (!data) {
+    return;
+  }
+  setFavouriteModel(data.connectionId, data.modelId);
+  const starSpan = document.getElementById(`index-favourite-model-${data.connectionId}-${data.modelId}`);
+  if (starSpan) {
+    starSpan.textContent = "★";
+    starSpan.style.color = "gold";
+    const otherStarSpans = document.querySelectorAll(`#index-models-modal-list span[id^="index-favourite-model-"]`);
+    otherStarSpans.forEach(span => {
+      if (span.id !== `index-favourite-model-${data.connectionId}-${data.modelId}`) {
+        span.textContent = "☆";
+        span.style.color = "var(--text-color)";
+      }
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modelElement = document.getElementById("index-model");
+  modelElement.addEventListener("click", () =>
+    openModal("index-models-modal"),
+  );
 });

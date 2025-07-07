@@ -1,0 +1,7 @@
+.index-hoverable {
+  cursor: pointer;
+}
+
+.index-hoverable:hover {
+  background-color: var(--accent-color)
+}
