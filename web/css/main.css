@@ -6,6 +6,7 @@
   --border-color: #333a47;
   --primary-button-color: var(--accent-color);
   --error-color: #ff4d4d;
+  --disabled-color: #555;
 }
 
 
@@ -160,7 +161,6 @@
   background-color: transparent;
   color: var(--text-color);
   resize: none;
-  ;
   outline: none;
 }
 
@@ -180,6 +180,11 @@
 
 .button:hover {
   filter: brightness(1.1);
+}
+
+.button:disabled {
+  background-color: var(--disabled-color);
+  pointer-events: none;
 }
 
 .error-message {

@@ -14,7 +14,7 @@ if (!serverKeyDb.selectWhereOne(() => true)) {
   const newKey = uuid();
   serverKeyDb.insert({ key: newKey });
 }
-if (!usersDb.selectWhereOne(user => user.username === "admin")) {
+if (!usersDb.selectWhereOne((user) => user.username === "admin")) {
   usersDb.insert({
     username: "admin",
     password: sha256("admin"),
@@ -26,7 +26,7 @@ module.exports = function auth() {
   const serverKey = serverKeyDb.selectWhereOne(() => true).key;
 
   function login(username, password) {
-    const user = usersDb.selectWhereOne(u => u.username === username);
+    const user = usersDb.selectWhereOne((u) => u.username === username);
     if (!user || user.password !== sha256(password)) {
       return false;
     }
@@ -45,11 +45,8 @@ module.exports = function auth() {
     return usersDb.selectAll().map(serializeUser);
   }
 
-  function addUser({
-    username,
-    password,
-  }) {
-    if (usersDb.selectWhereOne(user => user.username === username)) {
+  function addUser({ username, password }) {
+    if (usersDb.selectWhereOne((user) => user.username === username)) {
       throw new Error("User already exists");
     }
     const id = usersDb.insert({
@@ -57,7 +54,7 @@ module.exports = function auth() {
       password: sha256(password),
       createdAt: new Date().toISOString(),
     });
-    return usersDb.select(id);
+    return serializeUser(usersDb.select(id));
   }
 
   function removeUser(id) {
@@ -71,4 +68,4 @@ module.exports = function auth() {
     addUser,
     removeUser,
   };
-}
+};

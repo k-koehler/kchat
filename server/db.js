@@ -1,11 +1,11 @@
-const fs = require('fs');
-const uuid = require('./helpers/uuid');
+const fs = require("fs");
+const uuid = require("./helpers/uuid");
 
 const opType = {
-  INSERT: 'insert',
-  UPDATE: 'update',
-  DELETE: 'delete',
-}
+  INSERT: "insert",
+  UPDATE: "update",
+  DELETE: "delete",
+};
 
 class Op {
   constructor(id, type, data = null) {
@@ -21,17 +21,17 @@ class Op {
 
 module.exports = class DB {
   #lastProcessed;
-  #lastMutated;
+  #lastMutated = 0;
   #jsonCache;
   get #json() {
     if (this.#jsonCache && this.#lastProcessed >= this.#lastMutated) {
       return this.#jsonCache;
     }
-    const lines = fs.readFileSync(this.fn, 'utf-8').trim().split('\n');
+    const lines = fs.readFileSync(this.fn, "utf-8").split("\n");
     const json = {};
     for (const line of lines) {
-      const [id, type, ...dataMaybeSplit] = line.split(':');
-      const data = dataMaybeSplit.join(':');
+      const [id, type, ...dataMaybeSplit] = line.split(":");
+      const data = dataMaybeSplit.join(":");
       switch (type) {
         case opType.INSERT:
           json[id] = JSON.parse(data);
@@ -40,7 +40,8 @@ module.exports = class DB {
           if (!json[id]) {
             break;
           }
-
+          json[id] = JSON.parse(data);
+          break;
         case opType.DELETE:
           delete json[id];
           break;
@@ -53,14 +54,14 @@ module.exports = class DB {
 
   #writeOp(op) {
     const serialized = op.serialize();
+    fs.appendFileSync(this.fn, serialized + "\n");
     this.#lastMutated = Date.now();
-    fs.appendFileSync(this.fn, serialized + '\n');
   }
 
   constructor(fn) {
     this.fn = fn;
     if (!fs.existsSync(fn)) {
-      fs.writeFileSync(fn, "")
+      fs.writeFileSync(fn, "");
     }
   }
 
@@ -77,7 +78,7 @@ module.exports = class DB {
   }
 
   delete(id) {
-    const op = new Op(id, opType.DELETE)
+    const op = new Op(id, opType.DELETE);
     this.#writeOp(op);
   }
 
@@ -100,4 +101,4 @@ module.exports = class DB {
     const results = this.selectWhere(predicate);
     return results[0];
   }
-}
+};

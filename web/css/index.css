@@ -5,3 +5,16 @@
 .index-hoverable:hover {
   background-color: var(--accent-color)
 }
+
+.index-growing-textarea {
+width: -moz-available;
+width: -webkit-fill-available;
+padding: 0.5rem;
+border: 1px solid var(--border-color);
+border-radius: 0.25rem;
+background-color: transparent;
+color: var(--text-color);
+resize: none;
+outline: none;
+line-height: 22px;
+}

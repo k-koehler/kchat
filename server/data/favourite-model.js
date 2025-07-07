@@ -3,15 +3,18 @@ const favouriteModelDb = new DB("data/favourite-model.db");
 const connections = require("./connections")();
 
 module.exports = function favouriteModel() {
-  function setFavoriteModel({
-    userId,
-    connectionId,
-    modelId,
-  }) {
+  function setFavoriteModel({ userId, connectionId, modelId }) {
     const existing = favouriteModelDb.selectWhereOne(
       (f) => f.userId === userId
     );
-    if (existing) {
+    if (
+      existing &&
+      existing.userId === userId &&
+      existing.connectionId === connectionId &&
+      existing.modelId === modelId
+    ) {
+      return;
+    } else if (existing) {
       favouriteModelDb.update(existing.id, {
         userId,
         connectionId,
@@ -28,9 +31,7 @@ module.exports = function favouriteModel() {
     }
   }
 
-  async function findFavoriteModelByUserId(
-    userId,
-  ) {
+  async function findFavoriteModelByUserId(userId) {
     const favourite = favouriteModelDb.selectWhereOne(
       (f) => f.userId === userId
     );
@@ -46,9 +47,7 @@ module.exports = function favouriteModel() {
         connectionId: connection.id,
         modelId: model.id,
       });
-      return favouriteModelDb.selectWhereOne(
-        (f) => f.userId === userId,
-      );
+      return favouriteModelDb.selectWhereOne((f) => f.userId === userId);
     }
     return null;
   }
@@ -57,4 +56,4 @@ module.exports = function favouriteModel() {
     setFavoriteModel,
     findFavoriteModelByUserId,
   };
-}
+};

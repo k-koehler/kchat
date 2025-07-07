@@ -2,11 +2,7 @@ const DB = require("../db");
 const connectionsDb = new DB("data/connections.db");
 
 module.exports = function connections() {
-  function addConnection({
-    host,
-    key,
-    name,
-  }) {
+  function addConnection({ host, key, name }) {
     const id = connectionsDb.insert({
       host,
       key,
@@ -27,7 +23,9 @@ module.exports = function connections() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          ...connection.key ? { Authorization: `Bearer ${connection.key}` } : {},
+          ...(connection.key
+            ? { Authorization: `Bearer ${connection.key}` }
+            : {}),
         },
         signal: AbortSignal.timeout(5000),
       });
@@ -36,7 +34,9 @@ module.exports = function connections() {
       }
       const result = {
         connection,
-        models: (await response.json()).data.sort((a, b) => a.id.localeCompare(b.id)),
+        models: (await response.json()).data.sort((a, b) =>
+          a.id.localeCompare(b.id)
+        ),
       };
       return result;
     } catch {
@@ -50,11 +50,12 @@ module.exports = function connections() {
   async function findAllConnectionsModels() {
     const connections = findConnections();
     const connectionsModels = await Promise.all(
-      connections.map(c => fetchConnectionModels(c.id))
+      connections.map((c) => fetchConnectionModels(c.id))
     );
-    return connectionsModels.sort((a, b) => a.connection.id.localeCompare(b.connection.id))
+    return connectionsModels.sort((a, b) =>
+      a.connection.id.localeCompare(b.connection.id)
+    );
   }
-
 
   return {
     addConnection,
@@ -62,4 +63,4 @@ module.exports = function connections() {
     fetchConnectionModels,
     findAllConnectionsModels,
   };
-}
+};
