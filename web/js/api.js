@@ -112,6 +112,24 @@ export function removeUser(username) {
   })
 }
 
+export function addChat({
+  content,
+  connectionId,
+  modelId,
+}) {
+  return fetch(apiServer, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-kchat-token": localStorage.getItem("token"),
+    },
+    body: JSON.stringify({
+      topic: "addChat",
+      data: { content, connectionId, modelId },
+    }),
+  });
+}
+
 export function login(username, password) {
   return fetch(apiServer, {
     body: JSON.stringify({

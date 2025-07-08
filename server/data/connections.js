@@ -1,6 +1,14 @@
 const DB = require("../db");
 const connectionsDb = new DB("data/connections.db");
 
+// interface Connection {
+//   id: string;
+//   host: string;
+//   key: string;
+//   name: string;
+//   createdAt: string;
+// }
+
 module.exports = function connections() {
   async function addConnection({ host, key, name }) {
     const id = connectionsDb.insert({

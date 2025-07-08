@@ -2,7 +2,6 @@ const data = require("../data")();
 const withAuth = require("../helpers/with-auth");
 
 module.exports = withAuth(async function addConnection({
-  req,
   res,
 }, body) {
   if (!body.name || !body.host) {

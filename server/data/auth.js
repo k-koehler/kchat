@@ -4,6 +4,17 @@ const DB = require("../db");
 const serverKeyDb = new DB("data/auth-serverKey.db");
 const usersDb = new DB("data/auth-users.db");
 
+// interface User {
+//   id: string;
+//   username: string;
+//   password: string;
+//   createdAt: string;
+// }
+
+// interface ServerKey {
+//   key: string;
+// }
+
 function serializeUser(user) {
   const clone = { ...user };
   delete clone.password;
@@ -33,7 +44,6 @@ module.exports = function auth() {
   }
 
   async function login(username, password) {
-    console.log("Server key:", await getServerKey());
     const user = await usersDb.selectWhereOne((u) => u.username === username);
     if (!user || user.password !== sha256(password)) {
       return false;
@@ -62,7 +72,7 @@ module.exports = function auth() {
       password: sha256(password),
       createdAt: new Date().toISOString(),
     });
-    return serializeUser(usersDb.select(id));
+    return serializeUser(await usersDb.select(id));
   }
 
   async function removeUser(id) {

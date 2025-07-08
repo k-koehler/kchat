@@ -1,4 +1,4 @@
-import { findFavouriteModel, findModels, setFavouriteModel } from "./api.js";
+import { findFavouriteModel, findModels, setFavouriteModel, addChat } from "./api.js";
 import { getMeUsername, openModal, Observable, closeModal } from "./lib.js";
 
 const selectedConnectionModel = new Observable(null);
@@ -224,16 +224,11 @@ document.addEventListener("DOMContentLoaded", () => {
   inputElement.addEventListener("input", () => {
     sendButton.disabled = inputElement.value.trim() === "";
   });
-  indexForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    alert("Message sent: " + inputElement.value);
-  });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
   const textarea = document.getElementById("index-input");
   const button = document.getElementById("index-send-button");
-  const form = document.getElementById("index-form");
   const lineHeight = 22;
   const padding = 16;
   const maxHeight = lineHeight * 10 + padding;
@@ -248,4 +243,45 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   updateTextarea();
   textarea.addEventListener("input", updateTextarea);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("index-form");
+  const buttonText = document.getElementById("index-sent-button-text");
+  const buttonLoading = document.getElementById("index-sent-button-loading");
+  form.addEventListener("submit", async (event) => {
+    try {
+      event.preventDefault();
+      buttonText.style.display = "none";
+      buttonLoading.style.display = "inline-block";
+      const inputElement = document.getElementById("index-input");
+      const content = inputElement.value;
+      if (!content) {
+        return;
+      }
+      const connectionId = selectedConnectionModel.value?.connectionId;
+      const modelId = selectedConnectionModel.value?.modelId;
+      if (!connectionId || !modelId) {
+        // TODO handle error
+        return;
+      }
+      const response = await addChat({
+        content,
+        connectionId,
+        modelId,
+      });
+      if (!response.ok) {
+        // TODO handle error
+        console.error("Failed to add chat:", response.statusText);
+        return;
+      }
+      const chatId = await response.json();
+      window.location.href = `/chat?id=${chatId}`;
+    } catch {
+      // TODO handle error
+    } finally {
+      buttonText.style.display = "inline-block";
+      buttonLoading.style.display = "none";
+    }
+  });
 });

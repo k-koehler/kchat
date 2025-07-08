@@ -2,6 +2,14 @@ const DB = require("../db");
 const favouriteModelDb = new DB("data/favourite-model.db");
 const connections = require("./connections")();
 
+// interface FavouriteModel {
+//   id: string;
+//   userId: string;
+//   connectionId: string;
+//   modelId: string;
+//   createdAt: string;
+// }
+
 module.exports = function favouriteModel() {
   async function setFavoriteModel({ userId, connectionId, modelId }) {
     const existing = await favouriteModelDb.selectWhereOne(
