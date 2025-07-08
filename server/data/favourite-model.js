@@ -3,8 +3,8 @@ const favouriteModelDb = new DB("data/favourite-model.db");
 const connections = require("./connections")();
 
 module.exports = function favouriteModel() {
-  function setFavoriteModel({ userId, connectionId, modelId }) {
-    const existing = favouriteModelDb.selectWhereOne(
+  async function setFavoriteModel({ userId, connectionId, modelId }) {
+    const existing = await favouriteModelDb.selectWhereOne(
       (f) => f.userId === userId
     );
     if (
@@ -15,14 +15,14 @@ module.exports = function favouriteModel() {
     ) {
       return;
     } else if (existing) {
-      favouriteModelDb.update(existing.id, {
+      await favouriteModelDb.update(existing.id, {
         userId,
         connectionId,
         modelId,
         createdAt: existing.createdAt,
       });
     } else {
-      favouriteModelDb.insert({
+      await favouriteModelDb.insert({
         userId,
         connectionId,
         modelId,
@@ -32,7 +32,7 @@ module.exports = function favouriteModel() {
   }
 
   async function findFavoriteModelByUserId(userId) {
-    const favourite = favouriteModelDb.selectWhereOne(
+    const favourite = await favouriteModelDb.selectWhereOne(
       (f) => f.userId === userId
     );
     if (favourite) {
@@ -42,7 +42,7 @@ module.exports = function favouriteModel() {
     const connection = all[0]?.connection;
     const model = all[0]?.models?.[0];
     if (connection && model) {
-      setFavoriteModel({
+      await setFavoriteModel({
         userId,
         connectionId: connection.id,
         modelId: model.id,

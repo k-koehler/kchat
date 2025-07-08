@@ -1,7 +1,7 @@
 const data = require("../data")();
 const withAuth = require("../helpers/with-auth");
 
-module.exports = withAuth(function removeUser({
+module.exports = withAuth(async function removeUser({
   res,
 }, body) {
   const { username } = body;
@@ -10,7 +10,7 @@ module.exports = withAuth(function removeUser({
     res.end(JSON.stringify({ error: "Username is required" }));
     return;
   }
-  data.auth.removeUser(username);
+  await data.auth.removeUser(username);
   res.writeHead(200, { "Content-Type": "application/json" });
   res.end(JSON.stringify({}));
 });

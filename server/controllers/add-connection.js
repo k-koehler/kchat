@@ -1,7 +1,7 @@
 const data = require("../data")();
 const withAuth = require("../helpers/with-auth");
 
-module.exports = withAuth(function addConnection({
+module.exports = withAuth(async function addConnection({
   req,
   res,
 }, body) {
@@ -10,7 +10,7 @@ module.exports = withAuth(function addConnection({
     res.end(JSON.stringify({ error: "Name and host are required" }));
     return;
   }
-  const connection = data.connections.addConnection({
+  const connection = await data.connections.addConnection({
     name: body.name,
     host: body.host,
     key: body.key || "",

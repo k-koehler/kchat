@@ -1,6 +1,8 @@
-require("./api")();
-require("./data")();
-require("./static")();
+
+require("./init")().then(() => {
+  require("./api")();
+  require("./static")();
+});
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled Rejection:", error);

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const readline = require("readline");
 const uuid = require("./helpers/uuid");
 
 const opType = {
@@ -23,13 +24,21 @@ module.exports = class DB {
   #lastProcessed;
   #lastMutated = 0;
   #jsonCache;
-  get #json() {
+  #json() {
     if (this.#jsonCache && this.#lastProcessed >= this.#lastMutated) {
       return this.#jsonCache;
     }
-    const lines = fs.readFileSync(this.fn, "utf-8").split("\n");
+    const fileStream = fs.createReadStream(this.fn);
+    const rl = readline.createInterface({
+      input: fileStream,
+      crlfDelay: Infinity
+    });
+
     const json = {};
-    for (const line of lines) {
+    rl.on('line', (line) => {
+      if (!line.trim()) {
+        return
+      }
       const [id, type, ...dataMaybeSplit] = line.split(":");
       const data = dataMaybeSplit.join(":");
       switch (type) {
@@ -46,13 +55,17 @@ module.exports = class DB {
           delete json[id];
           break;
       }
-    }
-    this.#jsonCache = json;
-    this.#lastProcessed = Date.now();
-    return json;
+    });
+    return new Promise((resolve) => {
+      rl.on('close', () => {
+        this.#jsonCache = json;
+        this.#lastProcessed = Date.now();
+        resolve(json);
+      });
+    });
   }
 
-  #writeOp(op) {
+  async #writeOp(op) {
     const serialized = op.serialize();
     fs.appendFileSync(this.fn, serialized + "\n");
     this.#lastMutated = Date.now();
@@ -65,40 +78,43 @@ module.exports = class DB {
     }
   }
 
-  insert(data) {
+  async insert(data) {
     const id = uuid();
     const op = new Op(id, opType.INSERT, data);
     this.#writeOp(op);
     return id;
   }
 
-  update(id, data) {
+  async update(id, data) {
     const op = new Op(id, opType.UPDATE, data);
     this.#writeOp(op);
   }
 
-  delete(id) {
+  async delete(id) {
     const op = new Op(id, opType.DELETE);
     this.#writeOp(op);
   }
 
-  select(id) {
+  async select(id) {
+    const json = await this.#json();
     return {
       id,
-      ...this.#json[id],
+      ...json[id],
     };
   }
 
-  selectAll() {
-    return Object.entries(this.#json).map(([id, data]) => ({ id, ...data }));
+  async selectAll() {
+    const json = await this.#json();
+    return Object.entries(json).map(([id, data]) => ({ id, ...data }));
   }
 
-  selectWhere(predicate) {
-    return this.selectAll().filter(predicate);
+  async selectWhere(predicate) {
+    const results = await this.selectAll();
+    return results.filter(predicate);
   }
 
-  selectWhereOne(predicate) {
-    const results = this.selectWhere(predicate);
+  async selectWhereOne(predicate) {
+    const results = await this.selectWhere(predicate);
     return results[0];
   }
 };

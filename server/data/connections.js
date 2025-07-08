@@ -2,7 +2,7 @@ const DB = require("../db");
 const connectionsDb = new DB("data/connections.db");
 
 module.exports = function connections() {
-  function addConnection({ host, key, name }) {
+  async function addConnection({ host, key, name }) {
     const id = connectionsDb.insert({
       host,
       key,
@@ -17,7 +17,7 @@ module.exports = function connections() {
   }
 
   async function fetchConnectionModels(connectionId) {
-    const connection = connectionsDb.select(connectionId);
+    const connection = await connectionsDb.select(connectionId);
     try {
       const response = await fetch(`${connection.host}/models`, {
         method: "GET",
@@ -48,7 +48,7 @@ module.exports = function connections() {
   }
 
   async function findAllConnectionsModels() {
-    const connections = findConnections();
+    const connections = await findConnections();
     const connectionsModels = await Promise.all(
       connections.map((c) => fetchConnectionModels(c.id))
     );

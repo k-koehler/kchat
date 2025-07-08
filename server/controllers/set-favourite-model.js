@@ -11,7 +11,7 @@ module.exports = withAuth(async function setFavouriteModel({
     res.end(JSON.stringify({ error: "connectionId and modelId are required" }));
     return;
   }
-  data.favouriteModel.setFavoriteModel({
+  await data.favouriteModel.setFavoriteModel({
     userId: requester.id,
     connectionId,
     modelId,

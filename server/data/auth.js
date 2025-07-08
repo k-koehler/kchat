@@ -10,46 +10,54 @@ function serializeUser(user) {
   return clone;
 }
 
-if (!serverKeyDb.selectWhereOne(() => true)) {
-  const newKey = uuid();
-  serverKeyDb.insert({ key: newKey });
-}
-if (!usersDb.selectWhereOne((user) => user.username === "admin")) {
-  usersDb.insert({
-    username: "admin",
-    password: sha256("admin"),
-    createdAt: new Date().toISOString(),
-  });
-}
-
 module.exports = function auth() {
-  const serverKey = serverKeyDb.selectWhereOne(() => true).key;
+  async function createInitialUser() {
+    if (await usersDb.selectWhereOne((user) => user.username === "admin")) {
+      return;
+    }
+    await usersDb.insert({
+      username: "admin",
+      password: sha256("admin"),
+      createdAt: new Date().toISOString(),
+    });
+  }
 
-  function login(username, password) {
-    const user = usersDb.selectWhereOne((u) => u.username === username);
+  async function getServerKey() {
+    const keyEntry = await serverKeyDb.selectWhereOne(() => true);
+    if (!keyEntry) {
+      const newKey = uuid();
+      await serverKeyDb.insert({ key: newKey });
+      return newKey;
+    }
+    return keyEntry.key;
+  }
+
+  async function login(username, password) {
+    console.log("Server key:", await getServerKey());
+    const user = await usersDb.selectWhereOne((u) => u.username === username);
     if (!user || user.password !== sha256(password)) {
       return false;
     }
-    return `${sha256(serverKey)}.${user.id}`;
+    return `${sha256(await getServerKey())}.${user.id}`;
   }
 
-  function checkSession(sessionId) {
+  async function checkSession(sessionId) {
     const [signature, id] = sessionId.split(".");
-    if (sha256(serverKey) !== signature) {
+    if (sha256(await getServerKey()) !== signature) {
       return false;
     }
     return usersDb.select(id);
   }
 
-  function findUsers() {
-    return usersDb.selectAll().map(serializeUser);
+  async function findUsers() {
+    return (await usersDb.selectAll()).map(serializeUser);
   }
 
-  function addUser({ username, password }) {
-    if (usersDb.selectWhereOne((user) => user.username === username)) {
+  async function addUser({ username, password }) {
+    if (await usersDb.selectWhereOne((user) => user.username === username)) {
       throw new Error("User already exists");
     }
-    const id = usersDb.insert({
+    const id = await usersDb.insert({
       username,
       password: sha256(password),
       createdAt: new Date().toISOString(),
@@ -57,12 +65,13 @@ module.exports = function auth() {
     return serializeUser(usersDb.select(id));
   }
 
-  function removeUser(id) {
-    usersDb.delete(id);
+  async function removeUser(id) {
+    return usersDb.delete(id);
   }
 
   return {
     login,
+    createInitialUser,
     checkSession,
     findUsers,
     addUser,
