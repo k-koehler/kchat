@@ -31,13 +31,13 @@ module.exports = class DB {
     const fileStream = fs.createReadStream(this.fn);
     const rl = readline.createInterface({
       input: fileStream,
-      crlfDelay: Infinity
+      crlfDelay: Infinity,
     });
 
     const json = {};
-    rl.on('line', (line) => {
+    rl.on("line", (line) => {
       if (!line.trim()) {
-        return
+        return;
       }
       const [id, type, ...dataMaybeSplit] = line.split(":");
       const data = dataMaybeSplit.join(":");
@@ -49,7 +49,7 @@ module.exports = class DB {
           if (!json[id]) {
             break;
           }
-          json[id] = JSON.parse(data);
+          json[id] = { ...json[id], ...JSON.parse(data) };
           break;
         case opType.DELETE:
           delete json[id];
@@ -57,7 +57,7 @@ module.exports = class DB {
       }
     });
     return new Promise((resolve) => {
-      rl.on('close', () => {
+      rl.on("close", () => {
         this.#jsonCache = json;
         this.#lastProcessed = Date.now();
         resolve(json);
