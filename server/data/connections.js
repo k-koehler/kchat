@@ -20,6 +20,10 @@ module.exports = function connections() {
     return connectionsDb.select(id);
   }
 
+  function findConnection(id) {
+    return connectionsDb.select(id);
+  }
+
   function findConnections() {
     return connectionsDb.selectAll();
   }
@@ -68,6 +72,7 @@ module.exports = function connections() {
   return {
     addConnection,
     findConnections,
+    findConnection,
     fetchConnectionModels,
     findAllConnectionsModels,
   };

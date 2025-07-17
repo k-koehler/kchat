@@ -8,7 +8,11 @@ module.exports = withAuth(async function addChat({ res }, body) {
   });
   if (!body.content || !body.connectionId || !body.modelId) {
     res.writeHead(400, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "content, connectionId, and modelId are required" }));
+    res.end(
+      JSON.stringify({
+        error: "content, connectionId, and modelId are required",
+      })
+    );
     return;
   }
   const messageId = await data.message.addMessage({
@@ -19,7 +23,7 @@ module.exports = withAuth(async function addChat({ res }, body) {
     modelId: body.modelId,
     content: body.content,
   });
-  OpenAi.dispatchMessage(await data.message.getMessage(messageId));
+  OpenAi.dispatchMessage(await data.message.findMessage(messageId));
   res.writeHead(200, { "Content-Type": "application/json" });
   res.end(JSON.stringify(chat));
 });
