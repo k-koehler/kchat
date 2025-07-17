@@ -14,7 +14,18 @@
 
 <body class="body">
   <main class="page">
-    Loading<span class="loading-dots"></span>
+    <div>
+    </div>
+    <form style="position: fixed; bottom: 0; left: 0; right: 0; width: calc(100% - 4rem); margin: 1rem; gap: 0.5rem"
+      class="vertical">
+      <textarea class="basic-textarea" type="text" id="chat-input" placeholder="Type your message here..."
+        style="width: 100%;"></textarea>
+      <button class="button" disabled style="width: fit-content; align-self: end; margin-right: -1rem;" type="submit"
+        id="chat-send-button">
+        <span id="chat-sent-button-text">Send</span><span id="chat-sent-button-loading" style="display: none;"
+          class="loading-dots"></span>
+      </button>
+    </form>
   </main>
 </body>
 

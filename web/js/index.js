@@ -79,12 +79,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     if (connectionModels) {
       for (const model of connectionModels) {
-        // main model span
         const modelElement = document.createElement("span");
         modelElement.textContent = model.id;
         modelsList.appendChild(modelElement);
-
-        // model modal list items
         const modelModalListItem = modelModalListItemHtml
           .replaceAll("{{connectionId}}", connection.id)
           .replaceAll("{{modelId}}", model.id);

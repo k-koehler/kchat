@@ -37,7 +37,10 @@ module.exports = class OpenAi {
   static #streams = {};
 
   static async #openAiTokenStream({ connection, modelId, soFarMessages }) {
-    const url = `${connection.host}/v1/chat/completions`;
+    const connectionHost = connection.host.replaceAll("/v1", "");
+    const url = `${connectionHost}/v1/chat/completions`;
+    console.log(`Fetching OpenAI stream from ${url} with model ${modelId}`);
+
     const headers = {
       "Content-Type": "application/json",
       ...(connection.key ? { Authorization: `Bearer ${connection.key}` } : {}),
@@ -57,8 +60,7 @@ module.exports = class OpenAi {
     });
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch OpenAI stream: ${response.status} ${
-          response.statusText
+        `Failed to fetch OpenAI stream: ${response.status} ${response.statusText
         } ${await response.text()}`
       );
     }

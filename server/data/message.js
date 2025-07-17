@@ -1,5 +1,5 @@
 const DB = require("../db");
-const messageDb = new DB("data/message.db");
+const messageDb = new DB("data/messages.db");
 
 // interface Message {
 //   id: string;
