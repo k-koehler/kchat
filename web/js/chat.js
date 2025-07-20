@@ -1,4 +1,5 @@
 import { findChatMessages } from "./api.js";
+import { messageContentToHtml } from "./message-content-to-html.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const textarea = document.getElementById("chat-input");
@@ -31,5 +32,25 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
   }
   const messages = await response.json();
-  console.log("Chat messages:", messages);
+  const chatMessagesContainer = document.getElementById("chat-messages");
+  for (const message of messages) {
+    const messageElement = document.createElement("div");
+    messageElement.className = `chat-message ${message.openAiRole === "user" ? "chat-message-user" : "chat-message-assistant"
+      }`;
+    messageElement.innerHTML = `
+      ${message.openAiRole === "assistant" ? `<div style="font-weight: bold; margin-bottom: 1rem;">${message.modelId}</div>` : ''}
+      <div class="chat-message-content">${messageContentToHtml(message.content)
+      }</div>
+      <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <span style="color: var(--text-secondary); font-size: 0.8rem;">${new Date(message.createdAt).toLocaleString()}</span>
+        <div style="display: flex; flex-direction: row; gap: 0.5rem; font-size: 1.2rem; margin-left: 1rem;">
+          <div>🛈</div>
+          <div style="font-size: 1.5rem; margin-top: -4px">⟳</div>
+          <div>⧉</div>
+        </div>
+      </div>
+    `;
+    chatMessagesContainer.appendChild(messageElement);
+  }
+
 });

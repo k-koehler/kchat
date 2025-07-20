@@ -1,0 +1,25 @@
+.chat-messages {
+  overflow-y: auto;
+  height: calc(100vh - 10rem);
+}
+
+.chat-message {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.chat-message-user {
+  background-color: var(--card-bg-color);
+  color: var(--text-color);
+  align-self: flex-start;
+  margin-right: 1rem;
+}
+
+.chat-message-assistant {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  align-self: flex-end;
+  margin-left: 1rem;
+}
